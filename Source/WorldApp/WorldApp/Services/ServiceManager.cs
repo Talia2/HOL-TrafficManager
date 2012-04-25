@@ -29,7 +29,7 @@
                 {
                     status = new HostedServiceStatus()
                     {
-                        PartitionKey = String.Empty,
+                        PartitionKey = string.Empty,
                         RowKey = serviceUrlPrefix,
                         Region = serviceRegion,
                         IsOnline = true
@@ -50,16 +50,16 @@
             {
                 // A StorageClientException that returns the error message "Unexpected internal storage client error" may be retried. Other 
                 // errors are due to incorrect request parameters and should not be retried with the same parameters.
-                //DiagnosticUtility.Trace.LogException(scex, "Error initializing storage due to a client-side error.");
+                // DiagnosticUtility.Trace.LogException(scex, "Error initializing storage due to a client-side error.");
             }
             catch (StorageServerException)
             {
                 // These may be transient and requests resulting in such exceptions can be retried with the same parameters.
-                //DiagnosticUtility.Trace.LogException(ssex, "Error initializing storage due to a server-side error.");
+                // DiagnosticUtility.Trace.LogException(ssex, "Error initializing storage due to a server-side error.");
             }
         }
 
-        public void UpdateHostedServiceStatus(string serviceUrlPrefix, bool isOnline)
+        public void UpdateHostedServiceStatus(string serviceUrlPrefix, bool appIsOnline)
         {
             try
             {
@@ -71,7 +71,7 @@
                                                     .SingleOrDefault();
                 if (status != null)
                 {
-                    status.IsOnline = isOnline;
+                    status.IsOnline = appIsOnline;
                     context.UpdateObject(status);
                     context.SaveChangesWithRetries();
                 }
@@ -80,12 +80,12 @@
             {
                 // A StorageClientException that returns the error message "Unexpected internal storage client error" may be retried. Other 
                 // errors are due to incorrect request parameters and should not be retried with the same parameters.
-                //DiagnosticUtility.Trace.LogException(scex, "Error initializing storage due to a client-side error.");
+                // DiagnosticUtility.Trace.LogException(scex, "Error initializing storage due to a client-side error.");
             }
             catch (StorageServerException)
             {
                 // These may be transient and requests resulting in such exceptions can be retried with the same parameters.
-                //DiagnosticUtility.Trace.LogException(ssex, "Error initializing storage due to a server-side error.");
+                // DiagnosticUtility.Trace.LogException(ssex, "Error initializing storage due to a server-side error.");
             }
         }
 
@@ -98,7 +98,7 @@
 
         public bool GetHostedServiceStatus(string serviceUrlPrefix)
         {            
-            HostedServiceStatus status = GetHostedServiceStatus()
+            HostedServiceStatus status = this.GetHostedServiceStatus()
                                             .Where(service => service.RowKey == serviceUrlPrefix)
                                             .SingleOrDefault();
             if (status != null)

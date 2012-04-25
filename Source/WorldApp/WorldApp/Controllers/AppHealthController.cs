@@ -11,8 +11,8 @@
             string serviceUrlPrefix = RoleEnvironment.GetConfigurationSettingValue("HostedServiceUrlPrefix");
 
             ServiceManager manager = new ServiceManager();
-            bool isOnline = manager.GetHostedServiceStatus(serviceUrlPrefix);
-            if (!isOnline)
+            bool appIsOnline = manager.GetHostedServiceStatus(serviceUrlPrefix);
+            if (!appIsOnline)
             {
                 Response.Close();
             }

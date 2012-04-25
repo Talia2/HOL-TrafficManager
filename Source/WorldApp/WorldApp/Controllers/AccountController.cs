@@ -11,25 +11,16 @@ using WorldApp.Models;
 
 namespace WorldApp.Controllers
 {
-
     [HandleError]
     public class AccountController : Controller
     {
-
         public IFormsAuthenticationService FormsService { get; set; }
+
         public IMembershipService MembershipService { get; set; }
 
-        protected override void Initialize(RequestContext requestContext)
-        {
-            if (FormsService == null) { FormsService = new FormsAuthenticationService(); }
-            if (MembershipService == null) { MembershipService = new AccountMembershipService(); }
-
-            base.Initialize(requestContext);
-        }
-
-        // **************************************
-        // URL: /Account/LogOn
-        // **************************************
+        //// **************************************
+        //// URL: /Account/LogOn
+        //// **************************************
 
         public ActionResult LogOn()
         {
@@ -41,10 +32,10 @@ namespace WorldApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (MembershipService.ValidateUser(model.UserName, model.Password))
+                if (this.MembershipService.ValidateUser(model.UserName, model.Password))
                 {
-                    FormsService.SignIn(model.UserName, model.RememberMe);
-                    if (!String.IsNullOrEmpty(returnUrl))
+                    this.FormsService.SignIn(model.UserName, model.RememberMe);
+                    if (!string.IsNullOrEmpty(returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
@@ -55,7 +46,7 @@ namespace WorldApp.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "The user name or password provided is incorrect.");
+                    ModelState.AddModelError(string.Empty, "The user name or password provided is incorrect.");
                 }
             }
 
@@ -63,24 +54,24 @@ namespace WorldApp.Controllers
             return View(model);
         }
 
-        // **************************************
-        // URL: /Account/LogOff
-        // **************************************
+        //// **************************************
+        //// URL: /Account/LogOff
+        //// **************************************
 
         public ActionResult LogOff()
         {
-            FormsService.SignOut();
+            this.FormsService.SignOut();
 
             return RedirectToAction("Index", "Home");
         }
 
-        // **************************************
-        // URL: /Account/Register
-        // **************************************
+        //// **************************************
+        //// URL: /Account/Register
+        //// **************************************
 
         public ActionResult Register()
         {
-            ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            ViewData["PasswordLength"] = this.MembershipService.MinPasswordLength;
             return View();
         }
 
@@ -90,32 +81,32 @@ namespace WorldApp.Controllers
             if (ModelState.IsValid)
             {
                 // Attempt to register the user
-                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email);
+                MembershipCreateStatus createStatus = this.MembershipService.CreateUser(model.UserName, model.Password, model.Email);
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
-                    FormsService.SignIn(model.UserName, false /* createPersistentCookie */);
+                    this.FormsService.SignIn(model.UserName, false /* createPersistentCookie */);
                     return RedirectToAction("Index", "Home");
                 }
                 else
                 {
-                    ModelState.AddModelError("", AccountValidation.ErrorCodeToString(createStatus));
+                    ModelState.AddModelError(string.Empty, AccountValidation.ErrorCodeToString(createStatus));
                 }
             }
 
             // If we got this far, something failed, redisplay form
-            ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            ViewData["PasswordLength"] = this.MembershipService.MinPasswordLength;
             return View(model);
         }
 
-        // **************************************
-        // URL: /Account/ChangePassword
-        // **************************************
+        //// **************************************
+        //// URL: /Account/ChangePassword
+        //// **************************************
 
         [Authorize]
         public ActionResult ChangePassword()
         {
-            ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            ViewData["PasswordLength"] = this.MembershipService.MinPasswordLength;
             return View();
         }
 
@@ -125,29 +116,43 @@ namespace WorldApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (MembershipService.ChangePassword(User.Identity.Name, model.OldPassword, model.NewPassword))
+                if (this.MembershipService.ChangePassword(User.Identity.Name, model.OldPassword, model.NewPassword))
                 {
                     return RedirectToAction("ChangePasswordSuccess");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "The current password is incorrect or the new password is invalid.");
+                    ModelState.AddModelError(string.Empty, "The current password is incorrect or the new password is invalid.");
                 }
             }
 
             // If we got this far, something failed, redisplay form
-            ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            ViewData["PasswordLength"] = this.MembershipService.MinPasswordLength;
             return View(model);
         }
 
-        // **************************************
-        // URL: /Account/ChangePasswordSuccess
-        // **************************************
+        //// **************************************
+        //// URL: /Account/ChangePasswordSuccess
+        //// **************************************
 
         public ActionResult ChangePasswordSuccess()
         {
             return View();
         }
 
+        protected override void Initialize(RequestContext requestContext)
+        {
+            if (this.FormsService == null)
+            {
+                this.FormsService = new FormsAuthenticationService();
+            }
+
+            if (this.MembershipService == null)
+            {
+                this.MembershipService = new AccountMembershipService();
+            }
+
+            base.Initialize(requestContext);
+        }
     }
 }
