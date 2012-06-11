@@ -1,6 +1,5 @@
 ﻿namespace WorldApp.Services
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.WindowsAzure;
@@ -20,14 +19,14 @@
                 
                 tableStorage.CreateTableIfNotExist(ServiceStatusTableName);
 
-                HostedServiceStatus status = context.CreateQuery<HostedServiceStatus>(ServiceStatusTableName)
+                CloudServiceStatus status = context.CreateQuery<CloudServiceStatus>(ServiceStatusTableName)
                                                     .Where(p => p.RowKey == serviceUrlPrefix)
                                                     .AsTableServiceQuery()
                                                     .SingleOrDefault();
 
                 if (status == null)
                 {
-                    status = new HostedServiceStatus()
+                    status = new CloudServiceStatus()
                     {
                         PartitionKey = string.Empty,
                         RowKey = serviceUrlPrefix,
@@ -65,7 +64,7 @@
             {
                 TableServiceContext context = GetContext();
 
-                HostedServiceStatus status = context.CreateQuery<HostedServiceStatus>(ServiceStatusTableName)
+                CloudServiceStatus status = context.CreateQuery<CloudServiceStatus>(ServiceStatusTableName)
                                                     .Where(p => p.RowKey == serviceUrlPrefix)
                                                     .AsTableServiceQuery()
                                                     .SingleOrDefault();
@@ -89,16 +88,16 @@
             }
         }
 
-        public IEnumerable<HostedServiceStatus> GetHostedServiceStatus()
+        public IEnumerable<CloudServiceStatus> GetHostedServiceStatus()
         {
             TableServiceContext context = GetContext();
 
-            return context.CreateQuery<HostedServiceStatus>(ServiceStatusTableName).AsTableServiceQuery();
+            return context.CreateQuery<CloudServiceStatus>(ServiceStatusTableName).AsTableServiceQuery();
         }
 
         public bool GetHostedServiceStatus(string serviceUrlPrefix)
         {            
-            HostedServiceStatus status = this.GetHostedServiceStatus()
+            CloudServiceStatus status = this.GetHostedServiceStatus()
                                             .Where(service => service.RowKey == serviceUrlPrefix)
                                             .SingleOrDefault();
             if (status != null)

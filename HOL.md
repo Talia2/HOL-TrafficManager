@@ -6,15 +6,15 @@
 <a name="Overview"></a>
 ## Overview ##
 
-Windows Azure Traffic Manager is a load balancing solution that enables the distribution of incoming traffic among different hosted services in your Windows Azure subscription, regardless of their physical location. Traffic routing occurs as a the result of policies that you define and that are based on one of the following criteria:
+The Traffic Manager is a load balancing solution that enables the distribution of incoming traffic among different cloud services in your Windows Azure subscription, regardless of their physical location. Traffic routing occurs as a the result of policies that you define and that are based on one of the following criteria:
 
-- **Performance** - traffic is forwarded to the closest hosted service in terms of network latency
-- **Round Robin** - traffic is distributed equally across all hosted services
+- **Performance** - traffic is forwarded to the closest cloud service in terms of network latency
+- **Round Robin** - traffic is distributed equally across all cloud services
 - **Failover** - traffic is sent to a primary service and, if this service goes offline, to the next available service in a list
 
-You assign each policy a DNS name and associate it with multiple hosted services. The load balancer responds to queries for the policy DNS name with the address of one of the associated hosted services that satisfies the criteria for the policy. Traffic Manager constantly monitors hosted services to ensure they are online and will not route traffic to any service that is unavailable. 
+You assign each policy a DNS name and associate it with multiple cloud services. The load balancer responds to queries for the policy DNS name with the address of one of the associated cloud services that satisfies the criteria for the policy. Traffic Manager constantly monitors cloud services to ensure they are online and will not route traffic to any service that is unavailable. 
 
-In this hands-on lab, you will explore Windows Azure Traffic Manager by publishing a very simple application to multiple hosted services, each one in a different geographic region, and then create several Traffic Manager policies to evaluate how the load balancer routes traffic across these services.
+In this hands-on lab, you will explore Traffic Manager by publishing a very simple application to multiple cloud services, each one in a different geographic region, and then create several Traffic Manager policies to evaluate how the load balancer routes traffic across these services.
 
 <a name="AboutDnsCaching"></a>
 ### About DNS Caching ###
@@ -25,22 +25,22 @@ If the TTL of a DNS host entry in the cache expires, new requests for the same h
 
 Throughout the lab, you will be required to access policy endpoints repeatedly to evaluate their behavior. To ensure predictable results, it is essential that you do not use a cached entry. Restarting the browser is one way to guarantee this condition, but requires closing every open browser window before each request, even those that display other sites.
 
-To make this process simpler, the lab provides a registry script to shorten the lifetime of entries in the browser’s DNS cache. After executing the script and restarting the browser, evaluating a policy is simply a matter of waiting for the duration of the TTL and then refreshing the browser window. Note, however, that because this script changes Internet Explorer's configuration, you will only execute it inside a remote desktop session connected to one of the hosted services in the application.
+To make this process simpler, the lab provides a registry script to shorten the lifetime of entries in the browser’s DNS cache. After executing the script and restarting the browser, evaluating a policy is simply a matter of waiting for the duration of the TTL and then refreshing the browser window. Note, however, that because this script changes Internet Explorer's configuration, you will only execute it inside a remote desktop session connected to one of the cloud services in the application.
 
 For more information, see [Appendix B: Configuring the DNS Cache of the Browser](#AppendixB).
 
 <a name="AboutTheWorldApplication"></a>
 ### About the World Application ###
 
-The World Application is a sample ASP.NET application included in this hands-on lab to represent a global application that you could scale across multiple data centers by taking advantage of Windows Azure Traffic Manager. Although it does not implement any specific functionality of its own, the application does include some useful features that can assist you in the evaluation of Traffic Manager.
+The World Application is a sample ASP.NET application included in this hands-on lab to represent a global application that you could scale across multiple data centers by taking advantage of Traffic Manager. Although it does not implement any specific functionality of its own, the application does include some useful features that can assist you in the evaluation of Traffic Manager.
 
 Some of these features are:
 
-1. A customizable background and caption that allows you to determine, at a glance, which of the hosted services responds to a request
+1. A customizable background and caption that allows you to determine, at a glance, which of the cloud services responds to a request
 
 1. A timer-restarted with every page refresh-that shows the remaining time on the DNS host entry’s TTL and when it is safe to refresh the page to observe the result of a policy
 
-1. A control panel showing the status of each hosted service deployed including commands to enable or disable traffic to individual services
+1. A control panel showing the status of each cloud service deployed including commands to enable or disable traffic to individual services
 
 1. Download links for registry scripts to configure the lifetime of DNS host entries in the browser’s cache
 
@@ -50,19 +50,18 @@ Some of these features are:
 
 	_Home page of the World Application_
 
-Traffic Manager monitors hosted services by executing periodic HTTP GET requests to an endpoint that you specify when creating a policy. In the simplest case, this endpoint can be the URL to a file served by the application. Traffic Manager considers the service to be available if its monitoring endpoint responds with an HTTP status code of 200 OK within 5 seconds. For the application in this hands-on lab, this monitoring endpoint, located at the URL _/AppHealth_, has been implemented so that it can be disabled on demand. During the hands-on lab, you will exploit this feature to simulate a service failure.
-
+Traffic Manager monitors cloud services by executing periodic HTTP GET requests to an endpoint that you specify when creating a policy. In the simplest case, this endpoint can be the URL to a file served by the application. Traffic Manager considers the service to be available if its monitoring endpoint responds with an HTTP status code of 200 OK within 5 seconds. For the application in this hands-on lab, this monitoring endpoint, located at the URL _/AppHealth_, has been implemented so that it can be disabled on demand. During the hands-on lab, you will exploit this feature to simulate a service failure.
 
 <a name="Objectives"></a>
 ### Objectives ###
 
 In this Hands-On Lab, you will learn how to:
 
-- Define Windows Azure Traffic Manager policies
-- Route traffic to the hosted service that offers the best performance
-- Balance traffic across all hosted services
+- Define Traffic Manager policies
+- Route traffic to the cloud service that offers the best performance
+- Balance traffic across all cloud services
 - Create a active / standby configuration that routes traffic to a primary service and, in the event of failure, to other secondary services
-- Temporarily disable traffic to specific hosted services
+- Temporarily disable traffic to specific cloud services
 
 <a name="Prerequisites"></a>
 ### Prerequisites ###
@@ -71,8 +70,10 @@ The following is required to complete this hands-on lab:
 
 - [Microsoft .NET Framework 4.0](http://go.microsoft.com/fwlink/?linkid=186916)
 - [Microsoft Visual Studio 2010](http://msdn.microsoft.com/vstudio/products/)
-- [Windows Azure SDK and Windows Azure Tools for Microsoft Visual Studio 1.6](http://www.microsoft.com/windowsazure/sdk/)
-- [Windows Azure subscription](http://www.microsoft.com/windowsazure/offers/default.aspx)
+- [Windows Azure SDK and Windows Azure Tools for Microsoft Visual Studio 1.7](http://www.microsoft.com/windowsazure/sdk/)
+- A Windows Azure subscription - you can sign up for free trial [here](http://bit.ly/WindowsAzureFreeTrial)
+
+>**Note:** This lab was designed to use Windows 7 Operating System.
 
 ---
 
@@ -82,7 +83,7 @@ The following is required to complete this hands-on lab:
 This hands-on lab includes the following exercises:
 
 1. [Routing Traffic for Enhanced Performance](#Exercise1)
-1. [Balancing Traffic across Hosted Services](#Exercise2)
+1. [Balancing Traffic across Cloud Services](#Exercise2)
 1. [Increasing Availability with Failover Policies](#Exercise3)
 1. [Managing Traffic Manager Policies](#Exercise4)
 
@@ -90,14 +91,16 @@ Estimated time to complete this lab: **60 minutes**.
 
 > **Note:** When you first start Visual Studio, you must select one of the predefined settings collections. Every predefined collection is designed to match a particular development style and determines window layouts, editor behavior, IntelliSense code snippets, and dialog box options. The procedures in this lab describe the actions necessary to accomplish a given task in Visual Studio when using the **General Development Settings** collection. If you choose a different settings collection for your development environment, there may be differences in these procedures that you need to take into account.
 
+---
+
 <a name="GettingStarted"></a>
 ### Getting Started: Preparing and Publishing the Application ###
 
-During this hands-on lab, you will evaluate Windows Azure Traffic Manager by publishing a sample application to several hosted services. Furthermore, to obtain meaningful results when testing the performance load balancing method, these services should ideally be located in different geographic regions.
+During this hands-on lab, you will evaluate Traffic Manager by publishing a sample application to several cloud services. Furthermore, to obtain meaningful results when testing the performance load balancing method, these services should ideally be located in different geographic regions.
 
-Before you begin, you need to configure the application to enable remote desktop. This will allow you to open a remote desktop session to each of your hosted services and test access to the application from other regions. 
+Before you begin, you need to configure the application to enable remote desktop. This will allow you to open a remote desktop session to each of your cloud services and test access to the application from other regions. 
 
-In this exercise, you publish the application to multiple hosted services in your Windows Azure subscription. For each hosted service, you configure the application with settings appropriate to its region, create a hosted service in the Windows Azure Management Portal, upload the remote desktop certificate, and then deploy the application.
+In this exercise, you publish the application to multiple cloud services in your Windows Azure subscription. For each cloud service, you configure the application with settings appropriate to its region, create a cloud service in the Windows Azure Management Portal, upload the remote desktop certificate, and then deploy the application.
 
 <a name="GettingStartedTask1"></a>
 #### Task 1 – Preparing for Deployment ####
@@ -132,14 +135,14 @@ In this task, you prepare the application for deployment by enabling remote desk
 
 	_Configuring Remote Desktop settings_
 
-1. Before you close the dialog, click **View** next to the certificate drop down list. In the **Certificate** dialog, switch to the **Details** tab and click **Copy to File**. Follow the wizard to export the certificate to a file making sure that you **choose the option to export the private key**. Save the resulting file to a suitable location in your hard disk. You will need to upload this file to the Management Portal later, once you create a hosted service for your role.
+1. Before you close the dialog, click **View** next to the certificate drop down list. In the **Certificate** dialog, switch to the **Details** tab and click **Copy to File**. Follow the wizard to export the certificate to a file making sure that you **choose the option to export the private key**. Save the resulting file to a suitable location in your hard disk. You will need to upload this file to the Management Portal later, once you create a cloud service for your role.
 
 1. Click **OK** to close the **Remote Desktop Configuration**.
 
 <a name="GettingStartedTask2"></a>
 #### Task 2 - Configuring Storage Account Credentials ####
 
-In this task, you configure the credentials used by the application to access your Windows Azure Storage account.
+In this task, you configure the credentials used by the application to access your Storage account.
 
 > **Note:** All deployments used in this hands-on lab must share the same _DataConnectionString_ setting.
 
@@ -156,57 +159,47 @@ In this task, you configure the credentials used by the application to access yo
 <a name="GettingStartedTask3"></a>
 #### Task 3 - Publishing the Application to Multiple Regions ####
 
-In this task, you create the necessary hosted services in your Windows Azure subscription and then publish the application to different regions. You need to create at least two hosted services to be able to complete the steps in this lab, but three is the recommended number.
+In this task, you create the necessary cloud services in your Windows Azure subscription and then publish the application to different regions. You need to create at least two cloud services to be able to complete the steps in this lab, but three is the recommended number.
 
-Before publishing each hosted service, you update its configuration to specify a number of settings that will allow you to identify which hosted service responds to a given request.
+Before publishing each cloud service, you update its configuration to specify a number of settings that will allow you to identify which cloud service responds to a given request.
 
-The following procedure describes the steps required to create a hosted service and publish the application to it. You need to repeat this procedure for each hosted service that you publish. The table below suggests values for the configuration settings in each deployment, but you may choose different values if desired.
+The following procedure describes the steps required to create a cloud service and publish the application to it. You need to repeat this procedure for each cloud service that you publish. The table below suggests values for the configuration settings in each deployment, but you may choose different values if desired.
 
-| **Service Name**             | **URL prefix**            | **Region**       | **Background** |
+| **URL**            | **Region**       | **Background** |
 |------------------------------|---------------------------|------------------|----------------|
-| [AppName] - North Europe     | [appname]-europe-north    | North Europe     | _#5c87b2_      |
-| [AppName] - North Central US | [appname]-us-northcentral | North Central US | _#ff9900_      |
-| [AppName] - East Asia        | [appname]-asia-east       | East Asia        | _#99ff66_      |
+[appname]-europe-north    | North Europe     | _#5c87b2_      |
+[appname]-us-northcentral | North Central US | _#ff9900_      |
+[appname]-asia-east       | East Asia        | _#99ff66_      |
 
-The pattern followed by the hosted service URL prefix is **_[appname]-[region]_**, where **_[appname]_** is a unique identifier common to all hosted services that you deploy during this hands-on lab and **_[region]_** is the Windows Azure region where the service is created. The full URL of a hosted service is based on its URL prefix and public so you must choose the **_[appname]_** portion to avoid colliding with hosted services from other users.
+The pattern followed by the cloud service URL prefix is **_[appname]-[region]_**, where **_[appname]_** is a unique identifier common to all cloud services that you deploy during this hands-on lab and **_[region]_** is the Windows Azure region where the service is created. The full URL of a cloud service is based on its URL prefix and public so you must choose the **_[appname]_** portion to avoid colliding with cloud services from other users.
 
-To create a hosted service and deploy the application:
+To create a cloud service and deploy the application:
 
-1. Navigate to the [Windows Azure Management Portal](http://windows.azure.com/) and sign in using your Windows Live ID.
+1. Navigate to the [Windows Azure Management Portal](http://manage.windowsazure.com/) and log in with your Microsoft Account's credentials.
 
-1. In the navigation pane, select the **Hosted Services, Storage Accounts & CDN** tab followed by **Hosted Services**, and then click **New Hosted Service** on the ribbon.
+1. Click **New** | **Cloud Service** | **Quick Create**. Select a unique **URL** for your service, for example _worldapp-europe-north_. Refer to the table at the start of this task for suggested values. The dialog validates the URL prefix as you type it and warns you if the one you choose is unavailable.
 
-	![Creating a new hosted service at the Windows Azure Portal](images/creating-a-new-hosted-service-at-the-windows.png?raw=true "Creating a new hosted service at the Windows Azure Portal")
+1. To choose a region for the service, expand the drop down list labeled **Region / Affinity Group** and pick the region that corresponds to the service name and URL prefix used. Click **Create Cloud Service**.
 
-	_Creating a new hosted service at the Windows Azure Portal_
+	![Creating a new Cloud Service in Windows Azure](images/creating-a-new-cloud-service-in-windows-azure.png?raw=true "Creating a new Cloud Service in Windows Azure")
 
-1. In the **Create a new Hosted Service** dialog, if you have multiple subscriptions, pick the subscription where you will create the hosted services for this hands-on lab.
+	_Creating a new Cloud Service in Windows Azure_
 
-1. Next, enter a **Service Name** and the **URL Prefix** for the service. Refer to the table at the start of this task for suggested values. The dialog validates the URL prefix as you type it and warns you if the one you choose is unavailable.
+1. Upload the certificate used to encrypt the Remote Desktop password to the newly created service. To do this, select **Cloud Services** from the left pane, and click the name of the service you just created. Then, click **Certificates** from the top of the cloud service.
 
-1. To choose a region for the service, expand the drop down list labeled **Choose a region** and pick the region that corresponds to the service name and URL prefix used.
+	![Configuring the Cloud Service certificate](images/configuring-the-cloud-service-certificate.png?raw=true "Configuring the Cloud Service certificate")
 
-1. Finally, in the **Deploy** pane, select the option labeled **Do not deploy**, and then click **OK**.
+	_Configuring the Cloud Service certificate_
 
-	![Creating a new hosted service](images/creating-a-new-hosted-service.png?raw=true "Creating a new hosted service")
+1. In the **Upload Certificate** dialog, select the certificate you created and exported during the previous task when you configured remote desktop, enter the assigned password, anc click **tick**.
 
-	_Creating a new hosted service_
+	![Uploading the Cloud Service certificate](images/uploading-the-cloud-service-certificate.png?raw=true "Uploading the Cloud Service certificate")
 
-1. Upload the certificate used to encrypt the Remote Desktop password to the newly created service. To do this, expand the node for your hosted service to display and select the **Certificates** node and then click **Add Certificate** on the ribbon.
-
-	![Configuring hosted service certificates](images/configuring-hosted-service-certificates.png?raw=true "Configuring hosted service certificates")
-
-	_Configuring hosted service certificates_
-
-1. In the **Upload an X.509 Certificate** dialog, click **Browse** and navigate to the location where you stored the certificate that you created and exported during the previous task when you configured remote desktop, enter the assigned password, confirm it, and then click **OK**.
-
-	![Uploading the Remote Desktop certificate to the service](images/uploading-the-remote-desktop-certificate-to-t.png?raw=true "Uploading the Remote Desktop certificate to the service")
-
-	_Uploading the Remote Desktop certificate to the service_
+	_Uploading the Cloud Service certificate_
 
 1. Return to Visual Studio and update the configuration settings used to identify the region where the service is located. To do this, in **Solution Explorer**, expand the **Roles** node of the **WorldAppService** project, double-click **WorldApp** to open the properties window for this role, and then select the **Settings** tab.
 
-	> **Note:** The application includes several configuration settings that you update based on the Windows Azure region where you deploy the service, namely its region label, its URL prefix, and the background color for the UI. The latter setting allows you to identify which hosted service responds to a given request very easily.
+	> **Note:** The application includes several configuration settings that you update based on the Windows Azure region where you deploy the service, namely its region label, its URL prefix, and the background color for the UI. The latter setting allows you to identify which cloud service responds to a given request very easily.
 
 1. In the **Settings** page, set the _HostedServiceRegion_, _HostedServiceUrlPrefix_, and _HostedServiceBackgroundColor_ settings to the values in the table at the start of this task that match the region chosen for this service.
 
@@ -220,13 +213,13 @@ To create a hosted service and deploy the application:
 
 	> **Note:** If you have not previously deployed an application to Windows Azure from Visual Studio, you first need to create and configure the necessary credentials. For more information, see [Appendix A: Configuring your Windows Azure Management Portal Credentials in Visual Studio](#AppendixA).
 
-1. Next, select the hosted service you created for this region and set its **environment** to **Production**. Click **Publish** to begin the deployment.
+1. Next, select the cloud service you created for this region and set its **environment** to **Production**. Click **Publish** to begin the deployment.
 
 	![Deploying the application to Windows Azure](images/deploying-the-application-to-windows-azure.png?raw=true "Deploying the application to Windows Azure")
 
 	_Deploying the application to Windows Azure_
 
-	> **Note:** Traffic Manager policies only apply to hosted services in the production environment. You cannot route to services running in the staging environment.
+	> **Note:** Traffic Manager policies only apply to cloud services in the production environment. You cannot route to services running in the staging environment.
 
 1. After you start a deployment, you can examine the Windows Azure activity log window to determine the status of the operation. If this window is not visible, in the **View** menu, point to **Other Windows**, and then select **Windows Azure Activity Log**.  By default, the log shows a descriptive message and a progress bar to indicate the status of the deployment operation. To view detailed information about the operation in progress, click the green arrow on the left side of the activity log entry.
 
@@ -236,38 +229,44 @@ To create a hosted service and deploy the application:
 
 1. Repeat the procedure described in this task to deploy the service to other regions referring to the previous steps for a detailed description. These steps have been summarized below:
 
-	1. In the [Windows Azure Management Portal](http://windows.azure.com/), create a hosted service in a different region than the one chosen previously. 
+	1. In the [Windows Azure Management Portal](http://manage.windowsazure.com/), create a cloud service in a different region than the one chosen previously. 
 
 	1. Upload the certificate used to encrypt the remote desktop credentials. Use the same certificate that you created previously.
 
 	1. Before proceeding, examine the **Windows Azure Activity Log** to ensure that the previous deployment has completed its _“Uploading…”_ phase. This is a precaution to avoid overwriting the service configuration file before it has been completely uploaded.
 
-	1. Next, open the **Settings** page for the **WorldApp** role and update the _HostedServiceRegion_, _HostedServiceUrlPrefix_, and _HostedServiceBackgroundColor_ settings to reflect your choices when creating the current hosted service. Refer to the table at the start of this task for suggested configuration settings.
+	1. Next, open the **Settings** page for the **WorldApp** role and update the _HostedServiceRegion_, _HostedServiceUrlPrefix_, and _HostedServiceBackgroundColor_ settings to reflect your choices when creating the current cloud service. Refer to the table at the start of this task for suggested configuration settings.
 
-	1. Publish the project to the hosted service.
+	1. Publish the project to the cloud service.
 
-1. After you complete this task, the **Hosted Services** view in the Windows Azure Management Portal should list the hosted services for all regions that you deployed. You should have at least two hosted services in different regions. Make sure that the portal shows the status of all these services as _**Ready**_.
-
-	![Management Portal showing multiple hosted services created in different regions](images/management-portal-showing-multiple-hosted-ser.png?raw=true "Management Portal showing multiple hosted services created in different regions")
-
-	_Management Portal showing multiple hosted services created in different regions_
-
-	> **Note:** To display the **Region** and **URL Prefix** in the middle pane of the **Hosted Services** view, choose the corresponding columns in the drop down list labeled **Choose Columns** shown above the hosted service tree view.
+1. After you complete this task, the **Cloud Services** view in the Windows Azure Management Portal should list the cloud services for all regions that you deployed. You should have at least two cloud services in different regions. Make sure that the portal shows the status of all these services as _**Ready**_.
 
 <a name="GettingStartedTask4"></a>
 #### Task 4 - Configuring the DNS Cache for Testing ####
 
-In the remainder of this lab, you will open remote desktop sessions to your hosted services and test the application from inside each session. As was described previously, for these tests to be effective the browser in each case needs to be configured by running a registry script that shortens the lifetime of DNS cache entries.
+In the remainder of this lab, you will open remote desktop sessions to your cloud services and test the application from inside each session. As was described previously, for these tests to be effective the browser in each case needs to be configured by running a registry script that shortens the lifetime of DNS cache entries.
 
-In this task, you open a remote desktop session to a role instance in each of the hosted services and configure the browser suitably.
+In this task, you open a remote desktop session to a role instance in each of the cloud services and configure the browser suitably.
 
-1. In the Management Portal, locate the hosted service for the desired region and expand its node to show all its instances. Select the first instance, that is to say _[RoleName]_IN_0_, and then click **Connect** on the ribbon to open a remote desktop session to that instance.
-
+1. In the Management Portal, locate your cloud service and click on its name to see the service management page. Click **Configure** from the top menu and then click **Remote** from the bottom pane.
+	
 	![Establishing a remote desktop session to a role instance](images/establishing-a-remote-desktop-session-to-a-ro.png?raw=true "Establishing a remote desktop session to a role instance")
 
 	_Establishing a remote desktop session to a role instance_
 
-1. Inside the remote desktop session, open a browser window and navigate to the URL of the hosted service in the same region, namely _http://[appname]-[region].cloudapp.net_, where _[appname]-[region]_ is the URL prefix name that you configured for the hosted service. 
+1. Click **Open** in Internet Explorer prompt to begin the Remote Connection.
+
+	![Opening the Remote Desktop Connection](images/opening-the-remote-desktop-connection.png?raw=true "Opening the Remote Desktop Connection")
+
+	_Opening the Remote Desktop Connection_
+
+1. Enter the remote connection account credentials you specified during Task1 of this exercise.
+
+	![Remote connection account credentials](images/remote-connection-account-credentials.png?raw=true "Remote connection account credentials")
+
+	_Remote connection account credentials_
+
+1. Inside the remote desktop session, open a browser window and navigate to the URL of the cloud service in the same region, namely _http://[appname]-[region].cloudapp.net_, where _[appname]-[region]_ is the URL prefix name that you configured for the cloud service. 
 
 1. If access to the site is blocked by Internet Explorer’s enhanced security configuration, click **Add**.
 
@@ -282,7 +281,6 @@ In this task, you open a remote desktop session to a role instance in each of th
 	_Adding the Traffic Manager to the trusted sites zone_
 	
 	>**Note:**  You can also add the URL for the Traffic Manager’s domain to the list of trusted websites. To do this, type _http://*.[appname].trafficmanager.net,_ where _[appname]_ is the prefix chosen for your application and then click **Add**.
-
 
 1. Click **Close** twice to dismiss the enhanced security configuration dialogs and display the home page of the application.
 
@@ -311,35 +309,43 @@ In this task, you open a remote desktop session to a role instance in each of th
 	_Successful update of the browser’s configuration_
 
 1. Close all open browser windows and restart the browser for the changes to take effect.
-1. Repeat the previous steps until you have configured the browser in each of your hosted services, one for each region.
+1. Repeat the previous steps until you have configured the browser in each of your cloud services, one for each region.
 
-	> **Note:** Each hosted service is deployed with 2 instances. Make sure that you always connect to the same instance, for example instance 0, so that you execute your tests in a previously configured session.
+	> **Note:** Each cloud service is deployed with 2 instances. Make sure that you always connect to the same instance, for example instance 0, so that you execute your tests in a previously configured session.
+
+---
 
 <a name="Exercise1"></a>
 ### Exercise 1: Routing Traffic for Enhanced Performance ###
 
-Traffic Manager maintains a network performance table that it updates periodically and contains the round trip time between various IP addresses around the world and each Windows Azure data center. For the performance load balancing method, Traffic Manager forwards requests to the closest hosted service in terms of its network latency.
+Traffic Manager maintains a network performance table that it updates periodically and contains the round trip time between various IP addresses around the world and each Windows Azure data center. For the performance load balancing method, Traffic Manager forwards requests to the closest cloud service in terms of its network latency.
 
-Fully evaluating the results of this policy requires accessing the application from different geographic locations. Fortunately, this does not require you to travel around the world to complete this exercise. Instead, because you are deploying the application to multiple hosted services in various regions, you can take advantage of remote desktop to log into a hosted service in each of these regions and then access the application from within the remote session. In this case, the role instance acts as both the client and the server.
+Fully evaluating the results of this policy requires accessing the application from different geographic locations. Fortunately, this does not require you to travel around the world to complete this exercise. Instead, because you are deploying the application to multiple cloud services in various regions, you can take advantage of remote desktop to log into a cloud service in each of these regions and then access the application from within the remote session. In this case, the role instance acts as both the client and the server.
 
 <a name="Ex1Task1"></a>
 #### Task 1 - Creating a Traffic Manager Performance Policy ####
 
-In this task, you define a Traffic Manager policy that maximizes performance by forwarding traffic to the hosted service that offers the best performance for any given client. The load balancer bases its decision on performance tables that measure the round trip time of different IP addresses around the globe to each Windows Azure data center.
+In this task, you define a Traffic Manager policy that maximizes performance by forwarding traffic to the cloud service that offers the best performance for any given client. The load balancer bases its decision on performance tables that measure the round trip time of different IP addresses around the globe to each Windows Azure data center.
 
-1. In the Windows Azure Management Portal, select the **Virtual Network** tab. Then, choose the **Policies** option under **Traffic Manager** and click **Create** on the ribbon.
+1. To use the Traffic Manager, you need to access the previous management portal version. In order to do this, hover the mouse pointer over **Preview** in the main page header and click **Take me to the previous portal**.
 
-	![Creating a Windows Azure Traffic Manager policy](images/creating-a-windows-azure-traffic-manager-poli.png?raw=true "Creating a Windows Azure Traffic Manager policy")
+	![Switching to the Previous Portal](images/switch-to-previous-portal.png?raw=true "Switching to the Prodution Portal")
 
-	_Creating a Windows Azure Traffic Manager policy_
+	_Switching to the previous portal_
 
-1. In the **Create Traffic Manager Policy** dialog, pick the subscription where you created the hosted services for this hands-on lab.
+1. Once in the Production Portal, select the **Virtual Network** tab. Then, choose the **Policies** option under **Traffic Manager** and click **Create** on the ribbon.
+
+	![Creating a Traffic Manager policy](images/creating-a-windows-azure-traffic-manager-poli.png?raw=true "Creating a Traffic Manager policy")
+
+	_Creating a Traffic Manager policy_
+
+1. In the **Create Traffic Manager Policy** dialog, pick the subscription where you created the cloud services for this hands-on lab.
 
 1. Specify the **load balancing method** as **Performance**.
 
-1. Assign the **Hosted services to include in the policy** from the list of **Available DNS names**. Add all hosted services created for this hands-on lab. To add a service to the policy, select it and then click the arrow button in the middle.
+1. Assign the **Hosted services to include in the policy** from the list of **Available DNS names**. Add all cloud services created for this hands-on lab. To add a service to the policy, select it and then click the arrow button in the middle.
 
-	> **Note:** For subscriptions that contain a large number of hosted services, you can filter the list by typing the **[appname]** portion of the URL prefix in the text box shown above the list of DNS names.
+	> **Note:** For subscriptions that contain a large number of cloud services, you can filter the list by typing the **[appname]** portion of the URL prefix in the text box shown above the list of DNS names.
 
 1. Set the **Relative path and filename** of the monitoring endpoint to _/AppHealth_.
 
@@ -353,7 +359,7 @@ In this task, you define a Traffic Manager policy that maximizes performance by 
 
 1. To complete the policy definition, set the DNS time-to-live (TTL) to _30_ seconds.
 
-	> **Note:** The TTL determines for how long clients and secondary DNS servers cache a DNS host entry. Clients will continue to use a given hosted service until its entry in the cache expires.  For this hands-on lab, the TTL is set to the lowest possible value to allow policy results and changes in the status of services to be seen as early as possible. Note, however, that lowering this value increases DNS traffic and that you should consider keeping its default value for your production services.
+	> **Note:** The TTL determines for how long clients and secondary DNS servers cache a DNS host entry. Clients will continue to use a given cloud service until its entry in the cache expires.  For this hands-on lab, the TTL is set to the lowest possible value to allow policy results and changes in the status of services to be seen as early as possible. Note, however, that lowering this value increases DNS traffic and that you should consider keeping its default value for your production services.
 
 	![Creating a Traffic Manager policy for load balancing based on network performance](images/creating-a-traffic-manager-policy-for-load-ba.png?raw=true "Creating a Traffic Manager policy for load balancing based on network performance")
 
@@ -366,21 +372,21 @@ In this task, you define a Traffic Manager policy that maximizes performance by 
 <a name="Ex1Task2"></a>
 #### Task 2 - Testing the Performance Policy ####
 
-In this task, you test the performance policy defined previously. First, you test the policy from your own computer. Next, to observe the behavior of the policy when accessing the application from different geographic regions, you establish remote desktop sessions to every region where you deployed a hosted service. Inside each remote session, you browse the application to initiate a request originating from the same region as the hosted service. 
+In this task, you test the performance policy defined previously. First, you test the policy from your own computer. Next, to observe the behavior of the policy when accessing the application from different geographic regions, you establish remote desktop sessions to every region where you deployed a cloud service. Inside each remote session, you browse the application to initiate a request originating from the same region as the cloud service. 
 
-1. Open a browser window and navigate to _http://performance.[appname].trafficmanager.net/_, where _performance.[appname]_ is the DNS prefix name that you configured for the performance policy created in the previous task.  Notice the distinctive background color and the label in the first paragraph indicating the location of the hosted service that replies to the request. Verify that the response originated from the service closest to your current location.
+1. Open a browser window and navigate to _http://performance.[appname].trafficmanager.net/_, where _performance.[appname]_ is the DNS prefix name that you configured for the performance policy created in the previous task.  Notice the distinctive background color and the label in the first paragraph indicating the location of the cloud service that replies to the request. Verify that the response originated from the service closest to your current location.
 
 	![Testing the Traffic Manager performance policy in your own machine](images/testing-the-traffic-manager-performance-polic.png?raw=true "Testing the Traffic Manager performance policy in your own machine")
 
 	_Testing the Traffic Manager performance policy in your own machine_
 
-	> **Note:** For a performance policy, the load balancer determines which hosted service responds to a client request based on tables that record the round trip time between various IP addresses around the globe and each Windows Azure data center. Note, however, that while there is a strong correlation between distance and network latency and you would normally receive a response from the hosted service closest to your current location, other factors such as network topology and congestion could determine that you receive a response from a service that is further away.
+	> **Note:** For a performance policy, the load balancer determines which cloud service responds to a client request based on tables that record the round trip time between various IP addresses around the globe and each Windows Azure data center. Note, however, that while there is a strong correlation between distance and network latency and you would normally receive a response from the cloud service closest to your current location, other factors such as network topology and congestion could determine that you receive a response from a service that is further away.
 
-1. Now, in the navigation pane of the Windows Azure Management Portal, select the **Hosted Services, Storage Accounts & CDN** tab and then the **Hosted Services** option.
+1. Now, in the navigation pane of the Windows Azure Management Portal, select the **Cloud Services, Storage Accounts & CDN** tab and then the **Cloud Services** option.
 
-1. Locate one of the hosted services created for this hands-on lab and expand its node to show its instances. Select one of the instances and then click **Connect** on the ribbon to open a remote desktop session to that instance.
+1. Locate one of the cloud services created for this hands-on lab and expand its node to show its instances. Select one of the instances and then click **Connect** on the ribbon to open a remote desktop session to that instance.
 
-1. Inside the remote desktop session, open a browser window and navigate to _http://performance.[appname].trafficmanager.net/_, where _performance.[appname]_ is the DNS prefix name that you configured for the performance policy. Verify that the response originates from the hosted service in the same region as the remote desktop session.
+1. Inside the remote desktop session, open a browser window and navigate to _http://performance.[appname].trafficmanager.net/_, where _performance.[appname]_ is the DNS prefix name that you configured for the performance policy. Verify that the response originates from the cloud service in the same region as the remote desktop session.
 
 	> **Note:** Ensure that you connect to one of the role instances where you previously configured the DNS cache for the browser. Otherwise, click the link to download and run the registry configuration script and then restart the browser. After that, repeat the current step.
 
@@ -393,7 +399,7 @@ In this task, you test the performance policy defined previously. First, you tes
 
 	where _performance .[appname]_ is the DNS prefix name that you configured for the performance policy.
 
-	Notice the **Name** and **Address** returned by the DNS query, which should match that of the hosted service nearest to your current location.
+	Notice the **Name** and **Address** returned by the DNS query, which should match that of the cloud service nearest to your current location.
 
 	![Using nslookup to determine the address returned by the performance policy](images/using-nslookup-to-determine-the-address-retur.png?raw=true "Using nslookup to determine the address returned by the performance policy")
 
@@ -410,19 +416,19 @@ In this task, you test the performance policy defined previously. First, you tes
 <a name="Ex1Task3"></a>
 #### Task 3 - Simulating a Service Failure ####
 
-In this task, you place the hosted service that is currently servicing your requests in an offline state to simulate a failure.
+In this task, you place the cloud service that is currently servicing your requests in an offline state to simulate a failure.
 
-1. In the remote desktop session, navigate to _http://performance.[appname].trafficmanager.net/_ and determine the region of the hosted service that responds to the request.
+1. In the remote desktop session, navigate to _http://performance.[appname].trafficmanager.net/_ and determine the region of the cloud service that responds to the request.
 
 1. Now, locate this region in the **Hosted Service Status** table and click **Disable** to set its state to _Offline_. Notice that the Health Monitor Timeout column starts a timer that shows the elapsed time since the state of the service changed.
 
-	![Simulating the failure of a hosted service](images/simulating-the-failure-of-a-hosted-service.png?raw=true "Simulating the failure of a hosted service")
+	![Simulating the failure of a cloud service](images/simulating-the-failure-of-a-hosted-service.png?raw=true "Simulating the failure of a cloud service")
 
-	_Simulating the failure of a hosted service_
+	_Simulating the failure of a cloud service_
  
 	> **Note:** The Health Monitor Timeout provides an estimate of how long it takes Traffic Manager to become aware of the change.
 
-	> When a hosted service is disabled, its monitoring endpoint stops sending responses to simulate a failure. Traffic Manager performs a check of this endpoint at 30-second intervals and if it fails to receive a response to three consecutive polls, it considers the service as unavailable. Thus, it could take as much as 120 seconds for the service to failover.
+	> When a cloud service is disabled, its monitoring endpoint stops sending responses to simulate a failure. Traffic Manager performs a check of this endpoint at 30-second intervals and if it fails to receive a response to three consecutive polls, it considers the service as unavailable. Thus, it could take as much as 120 seconds for the service to failover.
 
 	> After you disable a service, a timer on the page starts showing the elapsed time since the status of the service changed, providing an estimate of how long it takes the Traffic Manager to become aware of the failure.
 
@@ -434,29 +440,31 @@ In this task, you place the hosted service that is currently servicing your requ
 
 	> **Note:** When a service comes back online, Traffic Manager detects the change in its status within the next polling interval. Thus, the interval shown by the Health Monitor Timeout when switching from offline to online is only 30 seconds.
 
-1. Refresh the page and confirm that the response is once again from the original hosted service.
+1. Refresh the page and confirm that the response is once again from the original cloud service.
+
+---
 
 <a name="Exercise2"></a>
-### Exercise 2: Balancing Traffic across Hosted Services ###
+### Exercise 2: Balancing Traffic across Cloud Services ###
 
-The round robin load balancing method distributes load evenly among each of the hosted services assigned to the policy. It keeps track of the last hosted service that received traffic and sends traffic to the next one in the list of hosted services.
+The round robin load balancing method distributes load evenly among each of the cloud services assigned to the policy. It keeps track of the last cloud service that received traffic and sends traffic to the next one in the list of cloud services.
 
-Traffic Manager removes a hosted service from the load balancer’s rotation if it determines that it is offline. Note, however, that if all services assigned to a policy are unavailable, Traffic Manager will ignore their status and return a response as if they were online.
+Traffic Manager removes a cloud service from the load balancer’s rotation if it determines that it is offline. Note, however, that if all services assigned to a policy are unavailable, Traffic Manager will ignore their status and return a response as if they were online.
 
 <a name="Ex2Task1"></a>
 #### Task 1 – Creating a Traffic Manager Round Robin Policy ####
 
-In this task, you create a Traffic Manager policy that balances traffic evenly across all hosted services assigned to the policy.
+In this task, you create a Traffic Manager policy that balances traffic evenly across all cloud services assigned to the policy.
 
 1. In the Windows Azure Management Portal, select the **Virtual Network** tab. Then, choose the **Policies** option under **Traffic Manager** and click **Create** on the ribbon.
 
-1. In the **Create Traffic Manager Policy** dialog, pick the subscription where you created the hosted services for this hands-on lab.
+1. In the **Create Traffic Manager Policy** dialog, pick the subscription where you created the cloud services for this hands-on lab.
 
 1. Specify the **load balancing method** as **Round Robin**.
 
-1. Select the hosted services to include in the policy from the list of **Available DNS names**. Add all hosted services created for this hands-on lab. To add a service to the policy, select it and then click the arrow button in the middle.
+1. Select the cloud services to include in the policy from the list of **Available DNS names**. Add all cloud services created for this hands-on lab. To add a service to the policy, select it and then click the arrow button in the middle.
 
-	> **Note:** For subscriptions that contain a large number of hosted services, you can filter the list by typing the **[appname]** portion of the URL prefix in the text box shown above the list of DNS names.
+	> **Note:** For subscriptions that contain a large number of cloud services, you can filter the list by typing the **[appname]** portion of the URL prefix in the text box shown above the list of DNS names.
 
 1. Set the **Relative path and filename** of the monitoring endpoint to _/AppHealth_.
 
@@ -464,9 +472,9 @@ In this task, you create a Traffic Manager policy that balances traffic evenly a
 
 1. Now, set the DNS time to live (TTL) to 30 seconds.
 
-	![Creating a Traffic Manager policy for load balancing traffic equally across hosted services](images/creating-a-traffic-manager-policy-for-hosted.png?raw=true "Creating a Traffic Manager policy for load balancing traffic equally across hosted services")
+	![Creating a Traffic Manager policy for load balancing traffic equally across cloud services](images/creating-a-traffic-manager-policy-for-hosted.png?raw=true "Creating a Traffic Manager policy for load balancing traffic equally across cloud services")
 
-	_Creating a Traffic Manager policy for load balancing traffic equally across hosted services_
+	_Creating a Traffic Manager policy for load balancing traffic equally across cloud services_
 
 1. Click **Create** to save the policy definition.
 
@@ -477,7 +485,7 @@ In this task, you create a Traffic Manager policy that balances traffic evenly a
 
 In this task, you test the round robin policy created during the previous task.
 
-1. In a remote desktop session to one of your hosted services, open a browser window and navigate to _http://roundrobin.[appname].trafficmanager.net/_, where _roundrobin.[appname]_ is the DNS prefix name that you configured for the round robin policy.
+1. In a remote desktop session to one of your cloud services, open a browser window and navigate to _http://roundrobin.[appname].trafficmanager.net/_, where _roundrobin.[appname]_ is the DNS prefix name that you configured for the round robin policy.
 
 	> **Note:** Ensure that you connect to one of the role instances where you previously configured the DNS cache for the browser. Otherwise, click the link to download and run the registry configuration script and then restart the browser. After that, repeat the current step.
 
@@ -489,7 +497,7 @@ In this task, you test the round robin policy created during the previous task.
 
 	_DNS host entry TTL_
 
-1. Once the TTL expires, refresh the page and notice that the background color of the page changes indicating that the response now originates from a hosted service located in a different region.
+1. Once the TTL expires, refresh the page and notice that the background color of the page changes indicating that the response now originates from a cloud service located in a different region.
 
 1. Wait until the TTL expires again and refresh the page one more time to verify that origin of the response has changed yet again.
  
@@ -504,31 +512,33 @@ In this task, you test the round robin policy created during the previous task.
 	nslookup roundrobin.[appname].trafficmanager.net 
 	````
 
-1. Repeat the command several times while waiting at least 30 seconds between attempts to allow the TTL to expire. Verify that the returned host cycles between each of the hosted services assigned to the round robin policy. 
+1. Repeat the command several times while waiting at least 30 seconds between attempts to allow the TTL to expire. Verify that the returned host cycles between each of the cloud services assigned to the round robin policy. 
 
 	![Using nslookup to evaluate the round robin policy](images/using-nslookup-to-evaluate-the-round-robin-po.png?raw=true "Using nslookup to evaluate the round robin policy")
 
 	_Using nslookup to evaluate the round robin policy_
 
+---
+
 <a name="Exercise3"></a>
 ### Exercise 3: Increasing Availability with Failover Policies ###
 
-When using a failover policy, if the primary hosted service is offline, traffic is sent to the next one in a sequence defined by the policy. To test this policy, the application provided with the lab includes a monitoring endpoint that Traffic Manager polls to determine whether the hosted service is available. 
+When using a failover policy, if the primary cloud service is offline, traffic is sent to the next one in a sequence defined by the policy. To test this policy, the application provided with the lab includes a monitoring endpoint that Traffic Manager polls to determine whether the cloud service is available. 
 
 <a name="Ex3Task1"></a>
 #### Task 1 – Creating a Traffic Manager Failover Policy ####
 
-In this task, you create a Traffic Manager policy that contains an ordered list of hosted services. Traffic is normally forwarded to the first service in this list—the primary service. If a service becomes unavailable, the load balancer switches to the next service in the list, and if that fails too, it will continue with the next in order.
+In this task, you create a Traffic Manager policy that contains an ordered list of cloud services. Traffic is normally forwarded to the first service in this list—the primary service. If a service becomes unavailable, the load balancer switches to the next service in the list, and if that fails too, it will continue with the next in order.
 
 1. In the Windows Azure Management Portal, select the **Virtual Network** tab. Then, choose the **Policies** option under **Traffic Manager** and click **Create** on the ribbon.
 
-1. In the **Create Traffic Manager Policy** dialog, pick the subscription where you created the hosted services for this hands-on lab.
+1. In the **Create Traffic Manager Policy** dialog, pick the subscription where you created the cloud services for this hands-on lab.
 
 1. Specify the **load balancing method** as **Failover**.
 
-1. Assign the **Hosted services to include in the policy** from the list of **Available DNS names**. Add all hosted services created for this hands-on lab. To add a service to the policy, select it and then click the arrow button in the middle.
+1. Assign the **Hosted services to include in the policy** from the list of **Available DNS names**. Add all cloud services created for this hands-on lab. To add a service to the policy, select it and then click the arrow button in the middle.
 
-	> **Note:** For subscriptions that contain a large number of hosted services, you can filter the list by typing the **[appname]** portion of the URL prefix in the text box shown above the list of DNS names.
+	> **Note:** For subscriptions that contain a large number of cloud services, you can filter the list by typing the **[appname]** portion of the URL prefix in the text box shown above the list of DNS names.
 
 1. Set the **Relative path and filename** of the monitoring endpoint to _/AppHealth_.
 
@@ -536,7 +546,7 @@ In this task, you create a Traffic Manager policy that contains an ordered list 
 
 1. Now, set the DNS time to live (TTL) to 30 seconds.
 
-1. Unlike the performance and round robin policies, where order does not matter, the load balancer chooses an active service based on its position in the list of selected DNS names. Choose the hosted service that will act as the primary and then move it to the top of the list. Arrange the remaining (standby) services in the order in which they should be activated in case the preceding services in the list fail. To change the order of a hosted service, select its DNS name in the list and then click the up arrow button until the service is in the desired position.
+1. Unlike the performance and round robin policies, where order does not matter, the load balancer chooses an active service based on its position in the list of selected DNS names. Choose the cloud service that will act as the primary and then move it to the top of the list. Arrange the remaining (standby) services in the order in which they should be activated in case the preceding services in the list fail. To change the order of a cloud service, select its DNS name in the list and then click the up arrow button until the service is in the desired position.
 
 	![Creating a failover Traffic Manager policy](images/creating-a-failover-traffic-manager-policy.png?raw=true "Creating a failover Traffic Manager policy")
 
@@ -551,86 +561,88 @@ In this task, you create a Traffic Manager policy that contains an ordered list 
 
 In this task, you test the failover policy created previously.
 
-1. In a remote desktop session to one of your hosted services, open a browser window and navigate to _http://failover.[appname].trafficmanager.net/_, where _failover.[appname]_ is the DNS prefix name that you configured for the failover policy.
+1. In a remote desktop session to one of your cloud services, open a browser window and navigate to _http://failover.[appname].trafficmanager.net/_, where _failover.[appname]_ is the DNS prefix name that you configured for the failover policy.
 
 	> **Note:** Ensure that you connect to one of the role instances where you previously configured the DNS cache for the browser. Otherwise, click the link to download and run the registry configuration script and then restart the browser. After that, repeat the current step.
 
-1. Verify that the hosted service that responds to the request is the one that you defined as primary by placing it at the top of the list of DNS names when you created the failover policy.
+1. Verify that the cloud service that responds to the request is the one that you defined as primary by placing it at the top of the list of DNS names when you created the failover policy.
 
-1. In the home page, the bottom half shows the status of each of your hosted services. Make sure that they are all Online.
+1. In the home page, the bottom half shows the status of each of your cloud services. Make sure that they are all Online.
 
-	![Examining the status of the hosted services](images/examining-the-status-of-the-hosted-services.png?raw=true "Examining the status of the hosted services")
+	![Examining the status of the cloud services](images/examining-the-status-of-the-hosted-services.png?raw=true "Examining the status of the cloud services")
 
-	_Examining the status of the hosted services_
+	_Examining the status of the cloud services_
 
 1. In the **Hosted Service Status** list, locate the primary service and then click **Disable** under **Manage Traffic**. Notice that the status of the service immediately changes to _Offline_ and the **Health Monitor Timeout** column begins displaying a timer.
  
-	![Disabling a hosted service to simulate a failure](images/disabling-a-hosted-service-to-simulate-a-fail.png?raw=true "Disabling a hosted service to simulate a failure")
+	![Disabling a cloud service to simulate a failure](images/disabling-a-hosted-service-to-simulate-a-fail.png?raw=true "Disabling a cloud service to simulate a failure")
 
-	_Disabling a hosted service to simulate a failure_
+	_Disabling a cloud service to simulate a failure_
 
-	> **Note:** When a hosted service is disabled, its monitoring endpoint stops sending responses to simulate a failure. Traffic Manager performs a check of this endpoint at 30-second intervals and if it fails to receive a response to three consecutive polls, it considers the service as unavailable. Thus, it could take as much as 120 seconds for the service to failover.
+	> **Note:** When a cloud service is disabled, its monitoring endpoint stops sending responses to simulate a failure. Traffic Manager performs a check of this endpoint at 30-second intervals and if it fails to receive a response to three consecutive polls, it considers the service as unavailable. Thus, it could take as much as 120 seconds for the service to failover.
 
 	> After you disable a service, a timer on the page starts showing the elapsed time since the status of the service changed, providing an estimate of how long it takes the Traffic Manager to become aware of the failure and switch to the next service in the list.
 
-1. Wait until the **Health Monitor Timeout** expires and its status is shown again as _Ready_. Then, refresh the page and verify that the response now originates from the second hosted service in the policy list.
+1. Wait until the **Health Monitor Timeout** expires and its status is shown again as _Ready_. Then, refresh the page and verify that the response now originates from the second cloud service in the policy list.
 
-1. Continue disabling hosted services following the same order as the policy list until all your hosted services are offline except one. After you disable each service, wait until the **Health Monitor Timeout** expires and then refresh the page. Confirm that the response is always from the next active (online) service in the policy list.
+1. Continue disabling cloud services following the same order as the policy list until all your cloud services are offline except one. After you disable each service, wait until the **Health Monitor Timeout** expires and then refresh the page. Confirm that the response is always from the next active (online) service in the policy list.
 
-1. Disable the last remaining service, wait until the **Health Monitor Timeout** expires, and then refresh the page one more time. Notice that when there are no more services available, the load balancer acts as if all services are online and routes traffic to the first hosted service in the policy list again.
+1. Disable the last remaining service, wait until the **Health Monitor Timeout** expires, and then refresh the page one more time. Notice that when there are no more services available, the load balancer acts as if all services are online and routes traffic to the first cloud service in the policy list again.
 
 1. Re-enable each service again, one at a time, testing the policy after each change.
 
 	> **Note:** When a service comes back online, Traffic Manager detects the change in its status within the next polling interval. Thus, the interval shown by the Health Monitor Timeout when switching from offline to online is only 30 seconds. 
 
+---
+
 <a name="Exercise4"></a>
 ### Exercise 4: Managing Traffic Manager Policies ###
 
-In this exercise, you learn how to disable one of the hosted services in a policy to remove it from the load balancer rotation. Next, you disable a Traffic Manager policy to prevent routing through its URL.
+In this exercise, you learn how to disable one of the cloud services in a policy to remove it from the load balancer rotation. Next, you disable a Traffic Manager policy to prevent routing through its URL.
 
 <a name="Ex4Task1"></a>
-#### Task 1 - Controlling Traffic to Individual Hosted Services ####
+#### Task 1 - Controlling Traffic to Individual Cloud Services ####
 
-You can disable individual hosted services assigned to a Traffic Manager policy.
+You can disable individual cloud services assigned to a Traffic Manager policy.
 
-In this task, you disable one of the hosted services in the round robin policy and then verify that traffic stops being routed to this service when accessed through this policy.
+In this task, you disable one of the cloud services in the round robin policy and then verify that traffic stops being routed to this service when accessed through this policy.
 
 1. Open the Traffic Manager interface in the Management Portal by selecting **Virtual Network** followed by the **Policies** option inside **Traffic Manager**.
 
-1. Locate and expand the round robin policy. Then, select one of the hosted services assigned to this policy and click **Disable Traffic** on the ribbon.
+1. Locate and expand the round robin policy. Then, select one of the cloud services assigned to this policy and click **Disable Traffic** on the ribbon.
 
 	![Managing traffic to individual host services in a policy](images/managing-traffic-to-individual-host-services.png?raw=true "Managing traffic to individual host services in a policy")
 
 	_Managing traffic to individual host services in a policy_
 
-1. In the **Disable Hosted Service in Traffic Manager policy** message box, click **Yes** to confirm that you wish to disable traffic to the selected service.
+1. In the **Disable Cloud Service in Traffic Manager policy** message box, click **Yes** to confirm that you wish to disable traffic to the selected service.
 
-	![Disabling traffic to a hosted service in a Traffic Manager policy](images/disabling-traffic-to-a-hosted-service-in-a-tr.png?raw=true "Disabling traffic to a hosted service in a Traffic Manager policy")
+	![Disabling traffic to a cloud service in a Traffic Manager policy](images/disabling-traffic-to-a-hosted-service-in-a-tr.png?raw=true "Disabling traffic to a cloud service in a Traffic Manager policy")
 
-	_Disabling traffic to a hosted service in a Traffic Manager policy_ 
+	_Disabling traffic to a cloud service in a Traffic Manager policy_ 
 
-1. Now, repeat the steps you followed previously to test the round robin policy and confirm that the disabled hosted service is no longer included in the load balancer sequence.
+1. Now, repeat the steps you followed previously to test the round robin policy and confirm that the disabled cloud service is no longer included in the load balancer sequence.
 
-	> **Note:** Disabling a hosted service in a Traffic Manager policy can be useful for temporarily removing a malfunctioning service or during maintenance tasks.
+	> **Note:** Disabling a cloud service in a Traffic Manager policy can be useful for temporarily removing a malfunctioning service or during maintenance tasks.
 
-1. Next, open a remote desktop session to an instance of the hosted service that you disabled in the round robin policy.
+1. Next, open a remote desktop session to an instance of the cloud service that you disabled in the round robin policy.
 
 1. In the remote desktop session, open a browser window and then access the service using the endpoint of the performance policy at _http://performance.[appname].trafficmanager.net/_. Notice that despite being disabled in the round robin policy, the service is still available when accessed through a different policy.
 
-1. Re-enable the hosted service in the round robin policy. To do this, in the Management Portal, expand the round robin policy, select the disabled hosted service, and then click **Enable Traffic** on the ribbon.
+1. Re-enable the cloud service in the round robin policy. To do this, in the Management Portal, expand the round robin policy, select the disabled cloud service, and then click **Enable Traffic** on the ribbon.
 
-	![Re-enabling traffic to a hosted service](images/re-enabling-traffic-to-a-hosted-service.png?raw=true "Re-enabling traffic to a hosted service")
+	![Re-enabling traffic to a cloud service](images/re-enabling-traffic-to-a-hosted-service.png?raw=true "Re-enabling traffic to a cloud service")
 
-	_Re-enabling traffic to a hosted service_
+	_Re-enabling traffic to a cloud service_
 
-1. Repeat the verification steps to confirm that the previously disabled hosted service is once again included in the load balancer sequence.
+1. Repeat the verification steps to confirm that the previously disabled cloud service is once again included in the load balancer sequence.
 
 <a name="Ex4Task2"></a>
 #### Task 2 - Disabling a Traffic Manager Policy ####
 
 You can temporarily disable a Traffic Manager policy to prevent it from routing traffic and then re-enable it again later.
 
-1. In a remote desktop session to one of your hosted services, open a browser window and navigate to _http://roundrobin.[appname].trafficmanager.net/_, where _roundrobin.[appname]_ is the DNS prefix name that you configured for the round robin policy.  Confirm that you are able to access the application.
+1. In a remote desktop session to one of your cloud services, open a browser window and navigate to _http://roundrobin.[appname].trafficmanager.net/_, where _roundrobin.[appname]_ is the DNS prefix name that you configured for the round robin policy.  Confirm that you are able to access the application.
 
 1. Now, in the Management Portal, open the Traffic Manager interface by selecting **Virtual Network** followed by the **Policies** option inside **Traffic Manager**.
 
@@ -683,9 +695,11 @@ You can temporarily disable a Traffic Manager policy to prevent it from routing 
 <a name="Summary"></a>
 ## Summary ##
 
-Windows Azure Traffic Manager enables you to manage and distribute incoming traffic to your Windows Azure hosted services whether they are deployed in the same data center or in different regions across the world.
+Windows Azure Traffic Manager enables you to manage and distribute incoming traffic to your Windows Azure cloud services whether they are deployed in the same data center or in different regions across the world.
 
-In this hands-on lab, you explored available load balancing policies and learned how to use them to enhance performance, increase availability, and balance traffic to your hosted services.
+In this hands-on lab, you explored available load balancing policies and learned how to use them to enhance performance, increase availability, and balance traffic to your cloud services.
+
+---
 
 <a name="AppendixA"></a>
 ## Appendix A: Configuring your Windows Azure Management Portal Credentials in Visual Studio ##
@@ -696,7 +710,7 @@ Follow these steps to save the credentials that allow you to deploy an applicati
 
 	> **Note:** Ensure that you click the Windows Azure cloud project and not one of its associated roles.
 
-1. It will prompt the **Publish Windows Azure Application** dialog. To publish an application, you first need to create the necessary credentials to access your Windows Azure account. To add a new set of credentials to your configuration, expand the **Subscription** drop down list and select **Manage**. If you have already added your credentials, chose them and skip this task.
+1. It will prompt the **Publish Windows Azure Application** dialog. To publish an application, you first need to create the necessary credentials to access your Microsoft account. To add a new set of credentials to your configuration, expand the **Subscription** drop down list and select **Manage**. If you have already added your credentials, chose them and skip this task.
 
 	![Adding Subscription’s credentials in Visual Studio](images/adding-subscriptions-credentials-in-visual-st.png?raw=true "Adding Subscription’s credentials in Visual Studio")
 
@@ -781,7 +795,7 @@ The following steps describe how to configure the lifetime of DNS host entries i
 
 This procedure is optional. If you choose not to execute it, you can force the browser to clear its DNS cache by closing all open windows and restarting the browser before each request.
 
-> **Important:** Running this script makes changes to your browser that can have an effect on your browsing experience. **You should only execute this script inside a remote desktop session to one of your hosted services.** 
+> **Important:** Running this script makes changes to your browser that can have an effect on your browsing experience. **You should only execute this script inside a remote desktop session to one of your cloud services.** 
 
 > Nevertheless, if you choose to apply the script in your local machine, you can undo its changes by applying a complementary script that is also provided. Note that both scripts assume that you have not previously customized Internet Explorer’s DNS cache configuration. Otherwise, running these scripts could overwrite your original configuration.
 

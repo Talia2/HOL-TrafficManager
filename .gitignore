@@ -48,7 +48,5 @@ pkg
 ~$*
 *.dbmdl
 coverage
-packages
-.nuget
 *.docstates
 *.InstallLog

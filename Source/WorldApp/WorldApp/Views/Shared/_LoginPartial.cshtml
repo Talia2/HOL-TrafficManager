@@ -1,0 +1,8 @@
+﻿@if (Request.IsAuthenticated) {
+    <p>
+        Welcome <b>@User.Identity.Name</b>!
+        [ @Html.ActionLink("Log Off", "LogOff", "Account") ]
+    </p>
+} else {
+    <text>[ @Html.ActionLink("Log On", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" }) ]</text>
+}

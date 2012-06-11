@@ -1,12 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <DependencyCheckerConfiguration version="2.0">
 	<title>Windows Azure Traffic Manager</title>
-	<dependencies>		
-		<dependency 
-			hint="WindowsAzureToolsVS2010" 
-			name="Windows Azure Tools for Microsoft Visual Studio 2010 1.6 or higher" 
-			helpLink="http://www.microsoft.com/web/gallery/install.aspx?appid=WindowsAzureToolsVS2010" 
+	<dependencies>
+		<dependency
+			hint="WindowsAzureToolsVS2010"
+			name="Windows Azure Tools for Microsoft Visual Studio 2010 (Latest)"
+			helpLink="http://go.microsoft.com/fwlink/?LinkID=231172"
 			disableSkip="false"
 			type="WebPI" />
+		<dependency 
+				hint="ASP.NET MVC 4.*" 
+				name="Microsoft ASP.NET MVC 4" 
+				description="ASP.NET MVC 4 is a framework for building scalable, standards-based web applications using well-established design patterns and the power of ASP.NET and the .NET Framework." 
+				helpLink="http://www.asp.net/mvc/mvc4" 
+				type="Uninstall" />
     </dependencies>
 </DependencyCheckerConfiguration>

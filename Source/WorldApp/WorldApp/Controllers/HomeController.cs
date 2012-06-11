@@ -10,7 +10,7 @@
     {
         public ActionResult Index()
         {
-            HostedServiceViewModel model = new HostedServiceViewModel()
+            CloudServiceViewModel model = new CloudServiceViewModel()
             {
                 HttpHost = Request["HTTP_HOST"],
                 ClientIPAddress = Request.UserHostAddress,
@@ -26,7 +26,7 @@
                 model.HostedServices.Add(service.RowKey, service);
             }
 
-            return View(model);
+            return this.View(model);
         }
 
         public ActionResult EnableTraffic(string serviceUrlPrefix, bool enabled)
@@ -34,12 +34,12 @@
             ServiceManager manager = new ServiceManager();
             manager.UpdateHostedServiceStatus(serviceUrlPrefix, enabled);
 
-            return RedirectToAction("Index");
+            return this.RedirectToAction("Index");
         }
 
         public ActionResult About()
         {
-            return View();
+            return this.View();
         }
     }
 }
