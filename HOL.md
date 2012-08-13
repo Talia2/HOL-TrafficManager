@@ -71,7 +71,7 @@ The following is required to complete this hands-on lab:
 - [Microsoft .NET Framework 4.0](http://go.microsoft.com/fwlink/?linkid=186916)
 - [Microsoft Visual Studio 2010](http://msdn.microsoft.com/vstudio/products/)
 - [Windows Azure SDK and Windows Azure Tools for Microsoft Visual Studio 1.7](http://www.microsoft.com/windowsazure/sdk/)
-- A Windows Azure subscription - you can sign up for free trial [here](http://bit.ly/WindowsAzureFreeTrial)
+- A Windows Azure subscription - [sign up for a free trial](http://aka.ms/WATK-FreeTrial)
 
 >**Note:** This lab was designed to use Windows 7 Operating System.
 
