@@ -8,11 +8,13 @@
 			helpLink=""
 			disableSkip="false"
 			type="WebPI" />
-		<dependency 
-				hint="ASP.NET MVC 4.*" 
-				name="Microsoft ASP.NET MVC 4" 
-				description="ASP.NET MVC 4 is a framework for building scalable, standards-based web applications using well-established design patterns and the power of ASP.NET and the .NET Framework." 
-				helpLink="http://www.asp.net/mvc/mvc4" 
-				type="Uninstall" />
+			
+		<dependency
+			hint="MVC4Vs2010_Loc" 
+			name="ASP.NET MVC 4 Tools Update with Language Packs (August 2012)"
+			helpLink=""
+			disableSkip="false"
+			type="WebPI" />
+			
     </dependencies>
 </DependencyCheckerConfiguration>

@@ -1,4 +1,6 @@
-# Windows Azure Traffic Manager #
+﻿# Windows Azure Traffic Manager #
+
+> **Note:** A Visual Studio 2012 version of this Hands-on Lab can be found in [GitHub](https://github.com/WindowsAzure-TrainingKit/HOL-TrafficManager-VS2012).
 
 ## Hands-on Lab ##
 

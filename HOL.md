@@ -16,6 +16,8 @@ You assign each policy a DNS name and associate it with multiple cloud services.
 
 In this hands-on lab, you will explore Traffic Manager by publishing a very simple application to multiple cloud services, each one in a different geographic region, and then create several Traffic Manager policies to evaluate how the load balancer routes traffic across these services.
 
+> **Note:** A Visual Studio 2012 version of this Hands-on Lab can be found in the latest build of the [Windows Azure training kit](http://bit.ly/WindowsAzureTK) or in [GitHub](https://github.com/WindowsAzure-TrainingKit/HOL-TrafficManager-VS2012).
+
 <a name="AboutDnsCaching"></a>
 ### About DNS Caching ###
 

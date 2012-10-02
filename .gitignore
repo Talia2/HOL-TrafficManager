@@ -50,3 +50,5 @@ pkg
 coverage
 *.docstates
 *.InstallLog
+
+packages
